@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   KeyboardAvoidingView,
   Picker,
@@ -9,36 +9,72 @@ import {
   View
 } from "react-native";
 
-import { classes, classProps } from "../utils/data";
-import PropCard from "../utils/PropCard";
+import { classes, classProps } from "../utils/constants";
+import PropCard from "../components/PropCard";
 
 const InputScreen = ({ navigation }) => {
   const [teacher, setTeacher] = useState("");
   const [classStyle, setClassStyle] = useState("podFIT");
   const [props, setProps] = useState([]);
+  const [unselectAll, setUnselectAll] = useState(true);
   const [notes, setNotes] = useState("");
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    const listener = navigation.addListener("didFocus", () => {
+      clearFields();
+    });
+
+    return () => listener.remove();
+  }, []);
+
+  useEffect(() => {
+    if (error && !!teacher) setError(false);
+  }, [teacher]);
+
+  const clearFields = () => {
+    setTeacher("");
+    setClassStyle("podFIT");
+    setProps([]);
+    setUnselectAll(true);
+    setNotes("");
+    setError(false);
+  };
+
+  const handleSubmit = () => {
+    if (!teacher) {
+      setError(true);
+      return;
+    }
+
+    navigation.navigate("Display", {
+      teacher,
+      classStyle,
+      props,
+      notes,
+      clearFields
+    });
+  };
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
-      <Text
-        style={styles.title}
-        onPress={() => navigation.navigate("Display", { teacher, classStyle })}
-      >
-        Set Up Your Class:
-      </Text>
-      <View style={styles.inputWrap}>
-        <Text style={styles.inputLabel}>Teacher:</Text>
-        <TextInput
-          style={styles.input}
-          value={teacher}
-          onChangeText={setTeacher}
-        />
+      <Text style={styles.title}>Set Up Your Class:</Text>
+      <View style={styles.inputContainer}>
+        <View style={styles.inputWrap}>
+          <Text style={styles.inputLabel}>Teacher:</Text>
+          <TextInput
+            style={styles.input}
+            value={teacher}
+            onChangeText={setTeacher}
+          />
+        </View>
+        {error && <Text style={styles.error}>Please enter your name</Text>}
       </View>
       <View style={styles.pickerWrap}>
         <Text style={styles.inputLabel}>Class Type:</Text>
         <Picker
           selectedValue={classStyle}
-          onValueChange={setClassStyle}
+          onValueChange={val => setClassStyle(val)}
           style={styles.picker}
         >
           {classes.map((c, i) => {
@@ -52,32 +88,48 @@ const InputScreen = ({ navigation }) => {
           <View style={styles.propsRow}>
             {classProps.map((p, i) => {
               if (i < 3) {
-                return <PropCard prop={p} key={i} />;
+                return (
+                  <PropCard
+                    prop={p}
+                    key={i}
+                    props={props}
+                    unselectAll={unselectAll}
+                    setUnselectAll={setUnselectAll}
+                  />
+                );
               }
             })}
           </View>
           <View style={styles.propsRow}>
             {classProps.map((p, i) => {
               if (i >= 3) {
-                return <PropCard prop={p} key={i} />;
+                return (
+                  <PropCard
+                    prop={p}
+                    key={i}
+                    props={props}
+                    unselectAll={unselectAll}
+                    setUnselectAll={setUnselectAll}
+                  />
+                );
               }
             })}
           </View>
         </View>
       </View>
-      <View style={styles.inputWrap}>
+      {/* <View style={styles.inputWrap}>
         <Text style={styles.inputLabel}>Class Notes:</Text>
         <TextInput
           multiline={true}
           numberOfLines={2}
           style={styles.notesInput}
         />
-      </View>
+      </View> */}
       <View style={styles.buttonWrap}>
-        <TouchableOpacity style={styles.clearBtn}>
+        <TouchableOpacity style={styles.clearBtn} onPress={() => clearFields()}>
           <Text style={styles.clearText}>Clear Fields</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.setBtn}>
+        <TouchableOpacity style={styles.setBtn} onPress={() => handleSubmit()}>
           <Text style={styles.setText}>Set Display</Text>
         </TouchableOpacity>
       </View>
@@ -90,11 +142,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "space-evenly"
   },
   title: {
     fontSize: 40,
     paddingBottom: 20
+  },
+  inputContainer: {
+    width: "100%",
+    alignItems: "center"
   },
   inputWrap: {
     flexDirection: "row",
@@ -111,6 +167,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     fontSize: 20,
     paddingLeft: 10
+  },
+  error: {
+    color: "firebrick",
+    fontSize: 20,
+    marginTop: 10
   },
   pickerWrap: {
     flexDirection: "row",
@@ -147,7 +208,8 @@ const styles = StyleSheet.create({
     backgroundColor: "gray",
     margin: 10,
     padding: 10,
-    borderRadius: 5
+    borderRadius: 5,
+    marginRight: 20
   },
   clearText: {
     color: "red",
@@ -157,7 +219,8 @@ const styles = StyleSheet.create({
     backgroundColor: "blue",
     margin: 10,
     padding: 10,
-    borderRadius: 5
+    borderRadius: 5,
+    marginLeft: 20
   },
   setText: {
     color: "white",
