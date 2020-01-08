@@ -5,6 +5,8 @@ export const classes = [
   "podHOT",
   "Sweat, Heat, & Beatz",
   "YIN",
+  "Audition",
+  "Private",
   "Teacher Training",
   "Workshop"
 ];

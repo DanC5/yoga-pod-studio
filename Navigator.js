@@ -1,16 +1,18 @@
 import { createAppContainer } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
 
+import IdleScreen from "./screens/Idle";
 import InputScreen from "./screens/Input";
 import DisplayScreen from "./screens/Display";
 
 const Navigator = createStackNavigator(
   {
+    Idle: { screen: IdleScreen },
     Input: { screen: InputScreen },
     Display: { screen: DisplayScreen }
   },
   {
-    initialRouteName: "Input",
+    initialRouteName: "Idle",
     defaultNavigationOptions: {
       headerTitle: "yoga pod",
       headerStyle: {

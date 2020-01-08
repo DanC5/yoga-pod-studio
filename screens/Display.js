@@ -11,31 +11,38 @@ const DisplayScreen = ({ navigation }) => {
     <View style={styles.container}>
       <Text style={styles.classHeader}>{classStyle}</Text>
       <Text style={styles.teacher}> with {teacher}</Text>
-      <Text style={styles.prompt}>Please grab...</Text>
-      <View style={styles.propsCol}>
-        <View style={styles.propsRow}>
-          {props.map((p, i) => {
-            if (i < 3) {
-              return (
-                <View style={styles.propsCard} key={i}>
-                  <Text style={styles.propsText}>{p}</Text>
-                </View>
-              );
-            }
-          })}
+      {props.length !== 0 && (
+        <View style={styles.propsCol}>
+          <Text style={styles.prompt}>Please grab...</Text>
+          <View style={styles.propsRow}>
+            {props.map((p, i) => {
+              if (i < 3) {
+                return (
+                  <View style={styles.propsCard} key={i}>
+                    <Text style={styles.propsText}>{p}</Text>
+                  </View>
+                );
+              }
+            })}
+          </View>
+          <View style={styles.propsRow}>
+            {props.map((p, i) => {
+              if (i >= 3) {
+                return (
+                  <View style={styles.propsCard} key={i}>
+                    <Text style={styles.propsText}>{p}</Text>
+                  </View>
+                );
+              }
+            })}
+          </View>
         </View>
-        <View style={styles.propsRow}>
-          {props.map((p, i) => {
-            if (i >= 3) {
-              return (
-                <View style={styles.propsCard} key={i}>
-                  <Text style={styles.propsText}>{p}</Text>
-                </View>
-              );
-            }
-          })}
+      )}
+      {!props.length && (
+        <View style={styles.propsCard}>
+          <Text style={styles.propsText}>No props specified</Text>
         </View>
-      </View>
+      )}
     </View>
   );
 };
