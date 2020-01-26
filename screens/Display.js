@@ -5,7 +5,6 @@ const DisplayScreen = ({ navigation }) => {
   const teacher = navigation.getParam("teacher");
   const classStyle = navigation.getParam("classStyle");
   const props = navigation.getParam("props");
-  // const notes = navigation.getParam("notes");
 
   return (
     <View style={styles.container}>
@@ -39,12 +38,18 @@ const DisplayScreen = ({ navigation }) => {
         </View>
       )}
       {!props.length && (
-        <View style={styles.propsCard}>
-          <Text style={styles.propsText}>No props specified</Text>
+        <View style={{ ...styles.propsCard, marginTop: 50 }}>
+          <Text style={{ ...styles.propsText, fontSize: 40 }}>
+            No props specified
+          </Text>
         </View>
       )}
     </View>
   );
+};
+
+DisplayScreen.navigationOptions = {
+  headerBackTitle: "Reset"
 };
 
 const styles = StyleSheet.create({
@@ -66,25 +71,33 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   prompt: {
-    fontSize: 60,
+    fontSize: 55,
     padding: 20,
-    marginTop: 20
+    marginTop: 20,
+    fontStyle: "italic"
   },
-  propsCol: {},
+  propsCol: {
+    alignItems: "center",
+    justifyContent: "center"
+  },
   propsRow: {
     flexDirection: "row",
-    justifyContent: "center"
+    justifyContent: "center",
+    marginLeft: 5,
+    marginRight: 15
   },
   propsCard: {
     padding: 10,
     margin: 10,
-    borderColor: "gray",
+    marginLeft: 20,
+    marginRight: 20,
+    borderColor: "#e6e6e6",
     borderWidth: 1,
     borderRadius: 5,
-    backgroundColor: "blue"
+    backgroundColor: "#00aeef"
   },
   propsText: {
-    fontSize: 50,
+    fontSize: 45,
     padding: 10,
     color: "#fff"
   }

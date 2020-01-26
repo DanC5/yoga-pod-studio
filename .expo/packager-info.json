@@ -1,9 +1,9 @@
 {
   "devToolsPort": 19002,
-  "expoServerPort": 19000,
-  "packagerPort": 19001,
-  "packagerPid": 41208,
-  "expoServerNgrokUrl": "https://vh-vah.anonymous.yoga-pod-studio.exp.direct",
-  "packagerNgrokUrl": "https://packager.vh-vah.anonymous.yoga-pod-studio.exp.direct",
-  "ngrokPid": 41228
+  "expoServerPort": null,
+  "packagerPort": null,
+  "packagerPid": null,
+  "expoServerNgrokUrl": null,
+  "packagerNgrokUrl": null,
+  "ngrokPid": null
 }

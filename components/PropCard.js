@@ -48,10 +48,10 @@ const styles = StyleSheet.create({
   selectedCard: {
     padding: 10,
     margin: 10,
-    borderColor: "gray",
+    borderColor: "#e6e6e6",
     borderWidth: 1,
     borderRadius: 5,
-    backgroundColor: "blue"
+    backgroundColor: "#00aeef"
   },
   unselectedText: {
     fontSize: 25,

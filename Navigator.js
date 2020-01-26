@@ -26,8 +26,7 @@ const Navigator = createStackNavigator(
       },
       headerLeftContainerStyle: {
         paddingBottom: 20
-      },
-      headerBackTitle: "Reset"
+      }
     }
   }
 );
