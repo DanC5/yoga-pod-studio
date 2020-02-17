@@ -1,5 +1,5 @@
 import React from "react";
-import { Image, StyleSheet, Text, TouchableHighlight } from "react-native";
+import { Image, StyleSheet, TouchableHighlight } from "react-native";
 
 const IdleScreen = ({ navigation }) => {
   return (
@@ -7,7 +7,11 @@ const IdleScreen = ({ navigation }) => {
       style={styles.container}
       onPress={() => navigation.navigate("Input")}
     >
-      <Image style={styles.image} source={require("../assets/46004812.png")} />
+      <Image
+        style={styles.breathe}
+        source={require("../assets/breatheFirst.png")}
+      />
+      {/* <Image style={styles.seed} source={require("../assets/seedPaper.png")} /> */}
     </TouchableHighlight>
   );
 };
@@ -19,9 +23,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center"
   },
-  image: {
+  breathe: {
     height: "50%",
-    width: "50%"
+    width: "80%"
+  },
+  seed: {
+    height: "70%",
+    width: "85%"
   }
 });
 
