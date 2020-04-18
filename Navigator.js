@@ -1,34 +1,50 @@
+import React from "react";
+import { Image, StyleSheet } from "react-native";
 import { createAppContainer } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
 
+import DisplayScreen from "./screens/Display";
 import IdleScreen from "./screens/Idle";
 import InputScreen from "./screens/Input";
-import DisplayScreen from "./screens/Display";
 
 const Navigator = createStackNavigator(
   {
+    Display: { screen: DisplayScreen },
     Idle: { screen: IdleScreen },
-    Input: { screen: InputScreen },
-    Display: { screen: DisplayScreen }
+    Input: { screen: InputScreen }
   },
   {
     initialRouteName: "Idle",
     defaultNavigationOptions: {
-      headerTitle: "yoga pod",
+      headerTitle: () => (
+        <Image
+          style={styles.header}
+          source={require("./assets/yp-white.png")}
+        />
+      ),
+      headerLeftContainerStyle: {
+        paddingBottom: 20
+      },
       headerStyle: {
         backgroundColor: "#000"
       },
       headerTintColor: "#fff",
-      headerTitleStyle: {
-        fontWeight: "bold",
-        fontSize: 30,
-        paddingBottom: 60
+      headerTitleContainerStyle: {
+        paddingBottom: 15
       },
-      headerLeftContainerStyle: {
-        paddingBottom: 20
+      headerTitleStyle: {
+        alignSelf: "center"
       }
     }
   }
 );
+
+const styles = StyleSheet.create({
+  header: {
+    flex: 1,
+    resizeMode: "contain",
+    width: 150
+  }
+});
 
 export default createAppContainer(Navigator);

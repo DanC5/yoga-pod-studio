@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const PropCard = ({ prop, props, unselectAll, setUnselectAll }) => {
+const PropCard = ({ prop, props, setUnselectAll, unselectAll }) => {
   const [selected, setSelected] = useState(false);
 
   useEffect(() => {
@@ -39,27 +39,27 @@ const PropCard = ({ prop, props, unselectAll, setUnselectAll }) => {
 
 const styles = StyleSheet.create({
   unselectedCard: {
-    padding: 10,
-    margin: 10,
     borderColor: "gray",
+    borderRadius: 5,
     borderWidth: 1,
-    borderRadius: 5
+    margin: 10,
+    padding: 10
   },
   selectedCard: {
-    padding: 10,
-    margin: 10,
+    backgroundColor: "#00aeef",
     borderColor: "#e6e6e6",
-    borderWidth: 1,
     borderRadius: 5,
-    backgroundColor: "#00aeef"
+    borderWidth: 1,
+    margin: 10,
+    padding: 10
   },
   unselectedText: {
-    fontSize: 25,
-    color: "gray"
+    color: "gray",
+    fontSize: 25
   },
   selectedText: {
-    fontSize: 25,
-    color: "#fff"
+    color: "#fff",
+    fontSize: 25
   }
 });
 

@@ -2,9 +2,9 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 const DisplayScreen = ({ navigation }) => {
-  const teacher = navigation.getParam("teacher");
   const classStyle = navigation.getParam("classStyle");
   const props = navigation.getParam("props");
+  const teacher = navigation.getParam("teacher");
 
   return (
     <View style={styles.container}>
@@ -54,27 +54,27 @@ DisplayScreen.navigationOptions = {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
+    backgroundColor: "#fff",
+    flex: 1,
     justifyContent: "center"
   },
   classHeader: {
-    fontSize: 100,
-    padding: 10,
     alignItems: "center",
-    justifyContent: "center"
+    fontSize: 100,
+    justifyContent: "center",
+    padding: 10
   },
   teacher: {
+    alignItems: "center",
     fontSize: 75,
-    padding: 10,
-    alignItems: "center"
+    padding: 10
   },
   prompt: {
     fontSize: 55,
-    padding: 20,
+    fontStyle: "italic",
     marginTop: 20,
-    fontStyle: "italic"
+    padding: 20
   },
   propsCol: {
     alignItems: "center",
@@ -87,19 +87,19 @@ const styles = StyleSheet.create({
     marginRight: 15
   },
   propsCard: {
-    padding: 10,
+    backgroundColor: "#00aeef",
+    borderColor: "#e6e6e6",
+    borderRadius: 5,
+    borderWidth: 1,
     margin: 10,
     marginLeft: 20,
     marginRight: 20,
-    borderColor: "#e6e6e6",
-    borderWidth: 1,
-    borderRadius: 5,
-    backgroundColor: "#00aeef"
+    padding: 10
   },
   propsText: {
+    color: "#fff",
     fontSize: 45,
-    padding: 10,
-    color: "#fff"
+    padding: 10
   }
 });
 

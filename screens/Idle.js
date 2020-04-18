@@ -4,32 +4,27 @@ import { Image, StyleSheet, TouchableHighlight } from "react-native";
 const IdleScreen = ({ navigation }) => {
   return (
     <TouchableHighlight
-      style={styles.container}
       onPress={() => navigation.navigate("Input")}
+      style={styles.container}
     >
       <Image
-        style={styles.breathe}
         source={require("../assets/breatheFirst.png")}
+        style={styles.breathe}
       />
-      {/* <Image style={styles.seed} source={require("../assets/seedPaper.png")} /> */}
     </TouchableHighlight>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
+    backgroundColor: "#fff",
+    flex: 1,
     justifyContent: "center"
   },
   breathe: {
-    height: "50%",
-    width: "80%"
-  },
-  seed: {
-    height: "70%",
-    width: "85%"
+    height: "55%",
+    width: "90%"
   }
 });
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -15,11 +15,11 @@ import { classes, classProps } from "../utils/constants";
 import PropCard from "../components/PropCard";
 
 const InputScreen = ({ navigation }) => {
-  const [teacher, setTeacher] = useState("");
   const [classStyle, setClassStyle] = useState("podFIT");
-  const [props, setProps] = useState([]);
-  const [unselectAll, setUnselectAll] = useState(true);
   const [error, setError] = useState(false);
+  const [props, setProps] = useState([]);
+  const [teacher, setTeacher] = useState("");
+  const [unselectAll, setUnselectAll] = useState(true);
 
   useEffect(() => {
     const listener = navigation.addListener("didFocus", () => {
@@ -34,32 +34,32 @@ const InputScreen = ({ navigation }) => {
   }, [teacher]);
 
   const clearFields = () => {
-    setTeacher("");
     setClassStyle("podFIT");
-    setProps([]);
-    setUnselectAll(true);
     setError(false);
+    setProps([]);
+    setTeacher("");
+    setUnselectAll(true);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     if (!teacher) {
       setError(true);
       return;
     }
 
     navigation.navigate("Display", {
-      teacher,
       classStyle,
+      clearFields,
       props,
-      clearFields
+      teacher
     });
-  };
+  }, [classStyle, clearFields, error, props, teacher]);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView
-        style={styles.container}
         behavior="padding"
+        style={styles.container}
         keyboardVerticalOffset={-250}
       >
         <Text style={styles.title}>Set Up Your Class:</Text>
@@ -67,11 +67,11 @@ const InputScreen = ({ navigation }) => {
           <View style={styles.inputWrap}>
             <Text style={styles.inputLabel}>Teacher:</Text>
             <TextInput
+              maxLength={20}
+              onChangeText={setTeacher}
+              returnKeyType={"next"}
               style={styles.input}
               value={teacher}
-              onChangeText={setTeacher}
-              maxLength={25}
-              returnKeyType={"next"}
             />
           </View>
           {error && <Text style={styles.error}>Please enter your name</Text>}
@@ -79,8 +79,8 @@ const InputScreen = ({ navigation }) => {
         <View style={styles.pickerWrap}>
           <Text style={styles.inputLabel}>Class Type:</Text>
           <Picker
-            selectedValue={classStyle}
             onValueChange={val => setClassStyle(val)}
+            selectedValue={classStyle}
             style={styles.picker}
           >
             {classes.map((c, i) => {
@@ -96,11 +96,11 @@ const InputScreen = ({ navigation }) => {
                 if (i < 3) {
                   return (
                     <PropCard
-                      prop={p}
                       key={i}
+                      prop={p}
                       props={props}
-                      unselectAll={unselectAll}
                       setUnselectAll={setUnselectAll}
+                      unselectAll={unselectAll}
                     />
                   );
                 }
@@ -111,11 +111,11 @@ const InputScreen = ({ navigation }) => {
                 if (i >= 3) {
                   return (
                     <PropCard
-                      prop={p}
                       key={i}
+                      prop={p}
                       props={props}
-                      unselectAll={unselectAll}
                       setUnselectAll={setUnselectAll}
+                      unselectAll={unselectAll}
                     />
                   );
                 }
@@ -142,33 +142,33 @@ InputScreen.navigationOptions = {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
+    backgroundColor: "#fff",
+    flex: 1,
     justifyContent: "space-evenly"
   },
   title: {
     fontSize: 40
   },
   inputContainer: {
-    width: "100%",
-    alignItems: "center"
+    alignItems: "center",
+    width: "100%"
   },
   inputWrap: {
-    flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
+    flexDirection: "row"
   },
   inputLabel: {
     fontSize: 30,
     paddingRight: 20
   },
   input: {
-    height: 40,
-    width: "30%",
     borderColor: "gray",
     borderWidth: 1,
     fontSize: 20,
-    paddingLeft: 10
+    height: 40,
+    paddingLeft: 10,
+    width: "30%"
   },
   error: {
     color: "firebrick",
@@ -176,21 +176,21 @@ const styles = StyleSheet.create({
     marginTop: 10
   },
   pickerWrap: {
-    flexDirection: "row",
     alignItems: "center",
+    flexDirection: "row",
     margin: -20
   },
   picker: {
-    width: 200,
-    height: "100%"
+    height: "100%",
+    width: 200
   },
   propsWrap: {
-    flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
+    flexDirection: "row"
   },
   propsCol: {
-    flexDirection: "column",
-    alignItems: "center"
+    alignItems: "center",
+    flexDirection: "column"
   },
   propsRow: {
     flexDirection: "row"
@@ -200,24 +200,22 @@ const styles = StyleSheet.create({
     marginBottom: 20
   },
   clearBtn: {
-    backgroundColor: "#d3d3d3",
     backgroundColor: "#e6e6e6",
-    margin: 10,
-    padding: 10,
     borderRadius: 5,
-    marginRight: 20
+    margin: 10,
+    marginRight: 20,
+    padding: 10
   },
   clearText: {
     color: "salmon",
     fontSize: 30
   },
   setBtn: {
-    backgroundColor: "#00aeef",
     backgroundColor: "#143980",
-    margin: 10,
-    padding: 10,
     borderRadius: 5,
-    marginLeft: 20
+    margin: 10,
+    marginLeft: 20,
+    padding: 10
   },
   setText: {
     color: "white",
