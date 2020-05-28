@@ -12,7 +12,14 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
-    }
+      "supportsTablet": true,
+      "isTabletOnly": true,
+      "bundleIdentifier": "com.yogapod.yogapodstudio",
+      "buildNumber": "1.0.0"
+    },
+    "splash": {
+      "backgroundColor": "#000"
+    },
+    "icon": "./assets/yps.png"
   }
 }
