@@ -1,25 +1,4 @@
 {
-  "expo": {
-    "assetBundlePatterns": ["**/*"],
-    "icon": "./assets/yps.png",
-    "name": "yoga-pod-studio",
-    "orientation": "landscape",
-    "platforms": ["ios", "android", "web"],
-    "privacy": "public",
-    "sdkVersion": "36.0.0",
-    "slug": "yps",
-    "version": "1.0.0",
-    "ios": {
-      "supportsTablet": true,
-      "isTabletOnly": true,
-      "bundleIdentifier": "com.yogapod.yogapodstudio",
-      "buildNumber": "1.0.0"
-    },
-    "splash": {
-      "backgroundColor": "#000"
-    },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    }
-  }
+  "name": "YPS",
+  "displayName": "YPS"
 }
