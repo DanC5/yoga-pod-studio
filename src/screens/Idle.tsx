@@ -9,20 +9,24 @@ export const IdleScreen = () => {
 
   return (
     <TouchableHighlight onPress={() => navigation.navigate("Input")} style={styles.container}>
-      <Image source={require("../../assets/breatheFirst.png")} style={styles.breathe} />
+      <Image
+        resizeMode="contain"
+        source={require("../../assets/breatheFirst.png")}
+        style={styles.breathe}
+      />
     </TouchableHighlight>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: "center",
     backgroundColor: "#fff",
-    flex: 1,
-    justifyContent: "center",
+    height: "100%",
+    width: "100%",
+    padding: 32,
   },
   breathe: {
-    height: "75%",
-    width: "90%",
+    height: "100%",
+    width: "100%",
   },
 });

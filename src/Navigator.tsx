@@ -37,17 +37,14 @@ export const Navigator: React.FC = () => {
         screenOptions={{
           headerTitle: HeaderTitle,
           headerLeftContainerStyle: {
-            paddingBottom: 20,
+            paddingBottom: 8,
           },
           headerStyle: {
             backgroundColor: "#000",
           },
           headerTintColor: "#fff",
           headerTitleContainerStyle: {
-            paddingBottom: 15,
-          },
-          headerTitleStyle: {
-            alignSelf: "center",
+            paddingBottom: 8,
           },
         }}
       >
@@ -67,6 +64,5 @@ const styles = StyleSheet.create({
   header: {
     flex: 1,
     resizeMode: "contain",
-    width: 150,
   },
 });
