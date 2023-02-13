@@ -68,6 +68,7 @@ export const InputScreen = () => {
               maxLength={20}
               onChangeText={setTeacher}
               returnKeyType={"next"}
+              selectionColor="#00aeef"
               style={styles.input}
               value={teacher}
             />
@@ -91,7 +92,7 @@ export const InputScreen = () => {
           <View style={styles.propsCol}>
             <View style={styles.propsRow}>
               {classProps.map((prop, index) => {
-                if (index < 3) {
+                if (index < 4) {
                   return (
                     <PropCard
                       key={index}
@@ -106,7 +107,7 @@ export const InputScreen = () => {
             </View>
             <View style={styles.propsRow}>
               {classProps.map((prop, index) => {
-                if (index >= 3) {
+                if (index >= 4) {
                   return (
                     <PropCard
                       key={index}
@@ -142,7 +143,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
   },
   title: {
-    fontSize: 40,
+    fontSize: 32,
+    fontWeight: "bold",
   },
   inputContainer: {
     alignItems: "center",
@@ -153,30 +155,30 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   inputLabel: {
-    fontSize: 30,
-    paddingRight: 20,
+    fontSize: 24,
+    fontWeight: "bold",
+    paddingRight: 24,
   },
   input: {
     borderColor: "gray",
+    borderRadius: 8,
     borderWidth: 1,
-    fontSize: 20,
-    height: 40,
-    paddingLeft: 10,
-    width: "30%",
+    fontSize: 24,
+    height: 48,
+    paddingLeft: 8,
+    width: "33%",
   },
   error: {
     color: "firebrick",
     fontSize: 20,
-    marginTop: 10,
+    marginTop: 8,
   },
   pickerWrap: {
     alignItems: "center",
     flexDirection: "row",
-    margin: -20,
   },
   picker: {
-    height: "100%",
-    width: 200,
+    width: 300,
   },
   propsWrap: {
     alignItems: "center",
@@ -191,28 +193,28 @@ const styles = StyleSheet.create({
   },
   buttonWrap: {
     flexDirection: "row",
-    marginBottom: 20,
+    marginBottom: 24,
   },
   clearBtn: {
     backgroundColor: "#e6e6e6",
-    borderRadius: 5,
-    margin: 10,
+    borderRadius: 8,
     marginRight: 20,
-    padding: 10,
+    padding: 16,
   },
   clearText: {
     color: "salmon",
-    fontSize: 30,
+    fontSize: 24,
+    fontWeight: "bold",
   },
   setBtn: {
     backgroundColor: "#143980",
-    borderRadius: 5,
-    margin: 10,
+    borderRadius: 8,
     marginLeft: 20,
-    padding: 10,
+    padding: 16,
   },
   setText: {
     color: "white",
-    fontSize: 30,
+    fontSize: 24,
+    fontWeight: "bold",
   },
 });

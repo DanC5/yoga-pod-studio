@@ -1,4 +1,5 @@
 export const classes = [
+  "BASICS",
   "FLOW 1",
   "FLOW 2",
   "FLOW 2 75",
@@ -12,9 +13,9 @@ export const classes = [
   "YIN",
   "YIN 45",
   "YIN 75",
-  "Private",
   "Teacher Training",
   "Workshop",
+  "Private",
 ];
 
 export const classProps = [

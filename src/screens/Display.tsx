@@ -15,7 +15,7 @@ export const DisplayScreen = () => {
     <View style={styles.container}>
       <Text style={styles.classHeader}>{classStyle}</Text>
       <Text style={styles.teacher}> with {teacher}</Text>
-      {props.length !== 0 && (
+      {!!props.length && (
         <View style={styles.propsCol}>
           <Text style={styles.prompt}>Please grab...</Text>
           <View style={styles.propsRow}>
@@ -65,19 +65,20 @@ const styles = StyleSheet.create({
   classHeader: {
     alignItems: "center",
     fontSize: 100,
+    fontWeight: "bold",
     justifyContent: "center",
-    padding: 10,
+    marginBottom: 8,
   },
   teacher: {
     alignItems: "center",
-    fontSize: 75,
-    padding: 10,
+    fontSize: 72,
+    marginBottom: 16,
   },
   prompt: {
-    fontSize: 55,
+    fontSize: 48,
     fontStyle: "italic",
-    marginTop: 20,
-    padding: 20,
+    marginTop: 16,
+    padding: 24,
   },
   propsCol: {
     alignItems: "center",
@@ -86,22 +87,19 @@ const styles = StyleSheet.create({
   propsRow: {
     flexDirection: "row",
     justifyContent: "center",
-    marginLeft: 5,
-    marginRight: 15,
   },
   propsCard: {
     backgroundColor: "#00aeef",
     borderColor: "#e6e6e6",
-    borderRadius: 5,
+    borderRadius: 8,
     borderWidth: 1,
-    margin: 10,
-    marginLeft: 20,
-    marginRight: 20,
-    padding: 10,
+    marginHorizontal: 20,
+    marginVertical: 12,
+    padding: 16,
   },
   propsText: {
     color: "#fff",
-    fontSize: 45,
-    padding: 10,
+    fontSize: 36,
+    fontWeight: "bold",
   },
 });

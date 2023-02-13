@@ -45,25 +45,26 @@ export const PropCard: React.FC<Props> = ({ prop, props, setUnselectAll, unselec
 const styles = StyleSheet.create({
   unselectedCard: {
     borderColor: "gray",
-    borderRadius: 5,
+    borderRadius: 8,
     borderWidth: 1,
     margin: 10,
-    padding: 10,
+    padding: 16,
   },
   selectedCard: {
     backgroundColor: "#00aeef",
     borderColor: "#e6e6e6",
-    borderRadius: 5,
+    borderRadius: 8,
     borderWidth: 1,
     margin: 10,
-    padding: 10,
+    padding: 16,
   },
   unselectedText: {
     color: "gray",
-    fontSize: 25,
+    fontSize: 20,
   },
   selectedText: {
     color: "#fff",
-    fontSize: 25,
+    fontSize: 20,
+    fontWeight: "bold",
   },
 });

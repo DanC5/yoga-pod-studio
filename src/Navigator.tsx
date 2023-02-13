@@ -54,7 +54,11 @@ export const Navigator: React.FC = () => {
           component={InputScreen}
           options={{ headerBackTitle: "Screen Saver" }}
         />
-        <Stack.Screen name="Display" component={DisplayScreen} />
+        <Stack.Screen
+          name="Display"
+          component={DisplayScreen}
+          options={{ headerBackTitle: "Class Setup" }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
