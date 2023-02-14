@@ -491,6 +491,7 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9QQCLU4HNY;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = YPS/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Yoga Pod Studio";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -527,6 +528,7 @@
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9QQCLU4HNY;
 				INFOPLIST_FILE = YPS/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Yoga Pod Studio";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
