@@ -1,11 +1,15 @@
-import React from "react";
-import { Image, StyleSheet } from "react-native";
-import { createNavigationContainerRef, NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator, StackNavigationProp } from "@react-navigation/stack";
+import React, { useState } from 'react';
+import { Image, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  createNavigationContainerRef,
+  NavigationContainer,
+  useRoute,
+} from '@react-navigation/native';
+import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 
-import { DisplayScreen } from "./screens/Display";
-import { IdleScreen } from "./screens/Idle";
-import { InputScreen } from "./screens/Input";
+import { DisplayScreen } from './screens/Display';
+import { IdleScreen } from './screens/Idle';
+import { InputScreen } from './screens/Input';
 
 type DisplayParams = {
   classStyle: string;
@@ -25,39 +29,54 @@ const navRef = createNavigationContainerRef();
 
 const Stack = createStackNavigator();
 
-const HeaderTitle = () => (
-  <Image style={styles.header} source={require("../assets/yp-white.png")} />
-);
+type Props = {
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const HeaderTitle: React.FC<Props> = ({ setIsModalOpen }) => {
+  const route = useRoute();
+
+  const handleLongPress =
+    route.name === 'Idle' ? () => setIsModalOpen((prev) => !prev) : () => null;
+
+  return (
+    <TouchableOpacity onLongPress={handleLongPress} style={styles.headerContainer}>
+      <Image style={styles.headerImage} source={require('../assets/yp-white.png')} />
+    </TouchableOpacity>
+  );
+};
 
 export const Navigator: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <NavigationContainer ref={navRef}>
       <Stack.Navigator
         initialRouteName="Idle"
         screenOptions={{
-          headerTitle: HeaderTitle,
+          headerTitle: () => <HeaderTitle setIsModalOpen={setIsModalOpen} />,
           headerLeftContainerStyle: {
             paddingBottom: 8,
           },
           headerStyle: {
-            backgroundColor: "#000",
+            backgroundColor: '#000',
           },
-          headerTintColor: "#fff",
+          headerTintColor: '#fff',
           headerTitleContainerStyle: {
             paddingBottom: 8,
           },
         }}
       >
-        <Stack.Screen name="Idle" component={IdleScreen} />
+        <Stack.Screen name="Idle">{() => <IdleScreen isModalOpen={isModalOpen} />}</Stack.Screen>
         <Stack.Screen
           name="Input"
           component={InputScreen}
-          options={{ headerBackTitle: "Screen Saver" }}
+          options={{ headerBackTitle: 'Screen Saver' }}
         />
         <Stack.Screen
           name="Display"
           component={DisplayScreen}
-          options={{ headerBackTitle: "Class Setup" }}
+          options={{ headerBackTitle: 'Class Setup' }}
         />
       </Stack.Navigator>
     </NavigationContainer>
@@ -65,8 +84,11 @@ export const Navigator: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  header: {
+  headerContainer: {
     flex: 1,
-    resizeMode: "contain",
+  },
+  headerImage: {
+    flex: 1,
+    resizeMode: 'contain',
   },
 });

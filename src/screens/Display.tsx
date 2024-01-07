@@ -1,10 +1,10 @@
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { RouteProp, useRoute } from '@react-navigation/native';
 
-import type { StackParamList } from "../Navigator";
+import type { StackParamList } from '../Navigator';
 
-type RouteParams = RouteProp<StackParamList, "Display">;
+type RouteParams = RouteProp<StackParamList, 'Display'>;
 
 export const DisplayScreen = () => {
   const {
@@ -52,45 +52,45 @@ export const DisplayScreen = () => {
 };
 
 DisplayScreen.navigationOptions = {
-  headerBackTitle: "Reset",
+  headerBackTitle: 'Reset',
 };
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: "center",
-    backgroundColor: "#fff",
+    alignItems: 'center',
+    backgroundColor: '#fff',
     flex: 1,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   classHeader: {
-    alignItems: "center",
+    alignItems: 'center',
     fontSize: 100,
-    fontWeight: "bold",
-    justifyContent: "center",
+    fontWeight: 'bold',
+    justifyContent: 'center',
     marginBottom: 8,
   },
   teacher: {
-    alignItems: "center",
+    alignItems: 'center',
     fontSize: 72,
     marginBottom: 16,
   },
   prompt: {
     fontSize: 48,
-    fontStyle: "italic",
+    fontStyle: 'italic',
     marginTop: 16,
     padding: 24,
   },
   propsCol: {
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   propsRow: {
-    flexDirection: "row",
-    justifyContent: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   propsCard: {
-    backgroundColor: "#00aeef",
-    borderColor: "#e6e6e6",
+    backgroundColor: '#00aeef',
+    borderColor: '#e6e6e6',
     borderRadius: 8,
     borderWidth: 1,
     marginHorizontal: 20,
@@ -98,8 +98,8 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   propsText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 36,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
 });

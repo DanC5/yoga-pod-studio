@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -8,22 +8,23 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { Picker } from "@react-native-picker/picker";
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { Picker } from '@react-native-picker/picker';
 
-import { PropCard } from "../components/PropCard";
-import { classes, classProps } from "../utils/constants";
+import { PropCard } from '../components/PropCard';
+import { useThemeContext } from '../context/ThemeContext';
 
-import type { NavigationProp } from "../Navigator";
+import type { NavigationProp } from '../Navigator';
 
 export const InputScreen = () => {
   const navigation = useNavigation<NavigationProp>();
+  const { classes, classProps, defaultClass, theme } = useThemeContext();
 
-  const [classStyle, setClassStyle] = useState("FLOW 2");
+  const [classStyle, setClassStyle] = useState(defaultClass);
   const [error, setError] = useState(false);
   const [props, setProps] = useState<string[]>([]);
-  const [teacher, setTeacher] = useState("");
+  const [teacher, setTeacher] = useState('');
   const [unselectAll, setUnselectAll] = useState(true);
 
   useEffect(() => {
@@ -34,10 +35,10 @@ export const InputScreen = () => {
   }, [teacher]);
 
   const clearFields = () => {
-    setClassStyle("FLOW 2");
+    setClassStyle(defaultClass);
     setError(false);
     setProps([]);
-    setTeacher("");
+    setTeacher('');
     setUnselectAll(true);
   };
 
@@ -46,7 +47,7 @@ export const InputScreen = () => {
       return setError(true);
     }
 
-    navigation.navigate("Display", {
+    navigation.navigate('Display', {
       classStyle,
       props,
       teacher,
@@ -67,7 +68,7 @@ export const InputScreen = () => {
             <TextInput
               maxLength={20}
               onChangeText={setTeacher}
-              returnKeyType={"next"}
+              returnKeyType={'next'}
               selectionColor="#00aeef"
               style={styles.input}
               value={teacher}
@@ -92,7 +93,7 @@ export const InputScreen = () => {
           <View style={styles.propsCol}>
             <View style={styles.propsRow}>
               {classProps.map((prop, index) => {
-                if (index < 4) {
+                if (index < (theme === 'gnv' ? 4 : 5)) {
                   return (
                     <PropCard
                       key={index}
@@ -107,7 +108,7 @@ export const InputScreen = () => {
             </View>
             <View style={styles.propsRow}>
               {classProps.map((prop, index) => {
-                if (index >= 4) {
+                if (index >= (theme === 'gnv' ? 4 : 5)) {
                   return (
                     <PropCard
                       key={index}
@@ -137,84 +138,84 @@ export const InputScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: "center",
-    backgroundColor: "#fff",
+    alignItems: 'center',
+    backgroundColor: '#fff',
     flex: 1,
-    justifyContent: "space-evenly",
+    justifyContent: 'space-evenly',
   },
   title: {
     fontSize: 32,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   inputContainer: {
-    alignItems: "center",
-    width: "100%",
+    alignItems: 'center',
+    width: '100%',
   },
   inputWrap: {
-    alignItems: "center",
-    flexDirection: "row",
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   inputLabel: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     paddingRight: 24,
   },
   input: {
-    borderColor: "gray",
+    borderColor: 'gray',
     borderRadius: 8,
     borderWidth: 1,
     fontSize: 24,
     height: 48,
     paddingLeft: 8,
-    width: "33%",
+    width: '33%',
   },
   error: {
-    color: "firebrick",
+    color: 'firebrick',
     fontSize: 20,
     marginTop: 8,
   },
   pickerWrap: {
-    alignItems: "center",
-    flexDirection: "row",
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   picker: {
     width: 300,
   },
   propsWrap: {
-    alignItems: "center",
-    flexDirection: "row",
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   propsCol: {
-    alignItems: "center",
-    flexDirection: "column",
+    alignItems: 'center',
+    flexDirection: 'column',
   },
   propsRow: {
-    flexDirection: "row",
+    flexDirection: 'row',
   },
   buttonWrap: {
-    flexDirection: "row",
+    flexDirection: 'row',
     marginBottom: 24,
   },
   clearBtn: {
-    backgroundColor: "#e6e6e6",
+    backgroundColor: '#e6e6e6',
     borderRadius: 8,
     marginRight: 20,
     padding: 16,
   },
   clearText: {
-    color: "salmon",
+    color: 'salmon',
     fontSize: 24,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   setBtn: {
-    backgroundColor: "#143980",
+    backgroundColor: '#143980',
     borderRadius: 8,
     marginLeft: 20,
     padding: 16,
   },
   setText: {
-    color: "white",
+    color: 'white',
     fontSize: 24,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
 });
