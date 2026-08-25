@@ -1,5 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+
+import { useThemeContext } from '../context/ThemeContext';
+
+import type { Palette } from '../constants/palette';
 
 type Props = {
   prop: string;
@@ -17,40 +21,46 @@ type Props = {
  * re-render from another source (rotation, keyboard, navigation) could
  * put the highlighted cards and the submitted array out of sync.
  */
-export const PropCard: React.FC<Props> = ({ prop, selected, onToggle }) => (
-  <TouchableOpacity
-    accessibilityRole="button"
-    accessibilityState={{ selected }}
-    onPress={() => onToggle(prop)}
-    style={selected ? styles.selectedCard : styles.unselectedCard}
-  >
-    <Text style={selected ? styles.selectedText : styles.unselectedText}>{prop}</Text>
-  </TouchableOpacity>
-);
+export const PropCard: React.FC<Props> = ({ prop, selected, onToggle }) => {
+  const { palette } = useThemeContext();
+  const styles = useMemo(() => makeStyles(palette), [palette]);
 
-const styles = StyleSheet.create({
-  unselectedCard: {
-    borderColor: 'gray',
-    borderRadius: 8,
-    borderWidth: 1,
-    margin: 10,
-    padding: 16,
-  },
-  selectedCard: {
-    backgroundColor: '#00aeef',
-    borderColor: '#e6e6e6',
-    borderRadius: 8,
-    borderWidth: 1,
-    margin: 10,
-    padding: 16,
-  },
-  unselectedText: {
-    color: 'gray',
-    fontSize: 20,
-  },
-  selectedText: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-});
+  return (
+    <TouchableOpacity
+      accessibilityRole="button"
+      accessibilityState={{ selected }}
+      onPress={() => onToggle(prop)}
+      style={selected ? styles.selectedCard : styles.unselectedCard}
+    >
+      <Text style={selected ? styles.selectedText : styles.unselectedText}>{prop}</Text>
+    </TouchableOpacity>
+  );
+};
+
+const makeStyles = (p: Palette) =>
+  StyleSheet.create({
+    unselectedCard: {
+      borderColor: p.border,
+      borderRadius: 8,
+      borderWidth: 1.5,
+      margin: 10,
+      padding: 16,
+    },
+    selectedCard: {
+      backgroundColor: p.accent,
+      borderColor: p.accent,
+      borderRadius: 8,
+      borderWidth: 1.5,
+      margin: 10,
+      padding: 16,
+    },
+    unselectedText: {
+      color: p.textMuted,
+      fontSize: 20,
+    },
+    selectedText: {
+      color: p.accentText,
+      fontSize: 20,
+      fontWeight: 'bold',
+    },
+  });

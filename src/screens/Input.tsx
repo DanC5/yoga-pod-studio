@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Keyboard,
+  StatusBar,
   KeyboardAvoidingView,
   StyleSheet,
   Text,
@@ -15,11 +16,13 @@ import { Picker } from '@react-native-picker/picker';
 import { PropCard } from '../components/PropCard';
 import { useThemeContext } from '../context/ThemeContext';
 
+import type { Palette } from '../constants/palette';
 import type { NavigationProp } from '../Navigator';
 
 export const InputScreen = () => {
   const navigation = useNavigation<NavigationProp>();
-  const { classes, classProps, defaultClass } = useThemeContext();
+  const { classes, classProps, defaultClass, palette } = useThemeContext();
+  const styles = useMemo(() => makeStyles(palette), [palette]);
 
   const [classStyle, setClassStyle] = useState(defaultClass);
   const [error, setError] = useState(false);
@@ -78,6 +81,7 @@ export const InputScreen = () => {
         style={styles.container}
         keyboardVerticalOffset={-250}
       >
+        <StatusBar barStyle={palette.statusBar} />
         <View style={styles.titleRow}>
           <Text style={styles.title}>Set Up Your Class:</Text>
           <TouchableOpacity
@@ -93,9 +97,10 @@ export const InputScreen = () => {
             <Text style={styles.inputLabel}>Teacher:</Text>
             <TextInput
               maxLength={20}
+              placeholderTextColor={palette.textMuted}
               onChangeText={setTeacher}
               returnKeyType={'next'}
-              selectionColor="#00aeef"
+              selectionColor={palette.accent}
               style={styles.input}
               value={teacher}
             />
@@ -106,6 +111,8 @@ export const InputScreen = () => {
         <View style={styles.pickerWrap}>
           <Text style={styles.inputLabel}>Class Type:</Text>
           <Picker
+            dropdownIconColor={palette.text}
+            itemStyle={{ color: palette.text }}
             onValueChange={(value) => setClassStyle(value)}
             selectedValue={classStyle}
             style={styles.picker}
@@ -145,104 +152,112 @@ export const InputScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    flex: 1,
-    justifyContent: 'space-evenly',
+const makeStyles = (p: Palette) =>
+  StyleSheet.create({
+      container: {
+      alignItems: 'center',
+      backgroundColor: p.bg,
+      flex: 1,
+      justifyContent: 'space-evenly',
   },
-  titleRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
+      titleRow: {
+      alignItems: 'center',
+      flexDirection: 'row',
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
+      title: {
+      color: p.text,
+      fontSize: 32,
+      fontWeight: 'bold',
   },
-  editListsBtn: {
-    borderColor: '#143980',
-    borderRadius: 8,
-    borderWidth: 1,
-    marginLeft: 24,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+      editListsBtn: {
+      borderColor: p.accent,
+      borderRadius: 8,
+      borderWidth: 1,
+      marginLeft: 24,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
   },
-  editListsText: {
-    color: '#143980',
-    fontSize: 18,
-    fontWeight: 'bold',
+      editListsText: {
+      color: p.accent,
+      fontSize: 18,
+      fontWeight: 'bold',
   },
-  inputContainer: {
-    alignItems: 'center',
-    width: '100%',
+      inputContainer: {
+      alignItems: 'center',
+      width: '100%',
   },
-  inputWrap: {
-    alignItems: 'center',
-    flexDirection: 'row',
+      inputWrap: {
+      alignItems: 'center',
+      flexDirection: 'row',
   },
-  inputLabel: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    paddingRight: 24,
+      inputLabel: {
+      color: p.text,
+      fontSize: 24,
+      fontWeight: 'bold',
+      paddingRight: 24,
   },
-  input: {
-    borderColor: 'gray',
-    borderRadius: 8,
-    borderWidth: 1,
-    fontSize: 24,
-    height: 48,
-    paddingLeft: 8,
-    width: '33%',
+      input: {
+      backgroundColor: p.surface,
+      color: p.text,
+      borderColor: p.border,
+      borderRadius: 8,
+      borderWidth: 1,
+      fontSize: 24,
+      height: 48,
+      paddingLeft: 8,
+      width: '33%',
   },
-  error: {
-    color: 'firebrick',
-    fontSize: 20,
-    marginTop: 8,
+      error: {
+      color: p.danger,
+      fontSize: 20,
+      marginTop: 8,
   },
-  pickerWrap: {
-    alignItems: 'center',
-    flexDirection: 'row',
+      pickerWrap: {
+      alignItems: 'center',
+      flexDirection: 'row',
   },
-  picker: {
-    width: 300,
+      picker: {
+      color: p.text,
+      width: 300,
   },
-  propsWrap: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingHorizontal: 24,
+      propsWrap: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      paddingHorizontal: 24,
   },
-  propsGrid: {
-    alignItems: 'center',
-    flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
+      propsGrid: {
+      alignItems: 'center',
+      flex: 1,
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
   },
-  buttonWrap: {
-    flexDirection: 'row',
-    marginBottom: 24,
+      buttonWrap: {
+      flexDirection: 'row',
+      marginBottom: 24,
   },
-  clearBtn: {
-    backgroundColor: '#e6e6e6',
-    borderRadius: 8,
-    marginRight: 20,
-    padding: 16,
+      clearBtn: {
+      backgroundColor: 'transparent',
+      borderColor: p.border,
+      borderWidth: 1.5,
+      borderRadius: 8,
+      marginRight: 20,
+      padding: 16,
   },
-  clearText: {
-    color: 'salmon',
-    fontSize: 24,
-    fontWeight: 'bold',
+      clearText: {
+      color: p.danger,
+      fontSize: 24,
+      fontWeight: 'bold',
   },
-  setBtn: {
-    backgroundColor: '#143980',
-    borderRadius: 8,
-    marginLeft: 20,
-    padding: 16,
+      setBtn: {
+      backgroundColor: p.accent,
+      borderRadius: 8,
+      marginLeft: 20,
+      padding: 16,
   },
-  setText: {
-    color: 'white',
-    fontSize: 24,
-    fontWeight: 'bold',
+      setText: {
+      color: p.accentText,
+      fontSize: 24,
+      fontWeight: 'bold',
   },
-});
+  });

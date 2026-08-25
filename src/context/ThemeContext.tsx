@@ -1,4 +1,5 @@
 import React, { PropsWithChildren, useCallback, useContext, useMemo, useState } from 'react';
+import { useColorScheme } from 'react-native';
 import { MMKV } from 'react-native-mmkv';
 
 import {
@@ -9,6 +10,13 @@ import {
   PREFERRED_DEFAULT_CLASS,
   type Location,
 } from '../constants/defaults';
+import {
+  DISPLAY_MODES,
+  PALETTES,
+  type Appearance,
+  type DisplayMode,
+  type Palette,
+} from '../constants/palette';
 
 /**
  * One module-level instance. Previously this was constructed inside the
@@ -18,6 +26,7 @@ import {
 const storage = new MMKV();
 
 const THEME_KEY = 'theme';
+const DISPLAY_MODE_KEY = 'displayMode';
 const classesKey = (location: Location) => `classes.${location}`;
 const propsKey = (location: Location) => `props.${location}`;
 
@@ -26,6 +35,11 @@ type ListMap = Record<Location, string[]>;
 const readTheme = (): Location => {
   const stored = storage.getString(THEME_KEY);
   return stored === 'boulder' || stored === 'gnv' ? stored : 'gnv';
+};
+
+const readDisplayMode = (): DisplayMode => {
+  const stored = storage.getString(DISPLAY_MODE_KEY);
+  return DISPLAY_MODES.includes(stored as DisplayMode) ? (stored as DisplayMode) : 'auto';
 };
 
 const readList = (key: string, fallback: string[]): string[] => {
@@ -73,6 +87,12 @@ type ThemeContextValue = {
   defaultClass: string;
   theme: Location;
   setTheme: (location: Location) => void;
+  /** Resolved look — what is actually on screen right now. */
+  palette: Palette;
+  appearance: Appearance;
+  /** What the user picked; 'auto' defers to the iPad's own setting. */
+  displayMode: DisplayMode;
+  setDisplayMode: (mode: DisplayMode) => void;
   addClass: (name: string) => AddResult;
   removeClass: (name: string) => void;
   resetClasses: () => void;
@@ -90,10 +110,22 @@ export const ThemeProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [theme, setThemeState] = useState<Location>(readTheme);
   const [allClasses, setAllClasses] = useState<ListMap>(readAllClasses);
   const [allProps, setAllProps] = useState<ListMap>(readAllProps);
+  const [displayMode, setDisplayModeState] = useState<DisplayMode>(readDisplayMode);
+
+  // iOS pushes this the moment the system appearance flips, so 'auto'
+  // re-themes on its own. No timer, nothing to drift, and daylight saving
+  // is somebody else's problem. Set the iPads to Display & Brightness >
+  // Automatic and they follow local sunrise and sunset.
+  const systemScheme = useColorScheme();
 
   const setTheme = useCallback((location: Location) => {
     setThemeState(location);
     storage.set(THEME_KEY, location);
+  }, []);
+
+  const setDisplayMode = useCallback((mode: DisplayMode) => {
+    setDisplayModeState(mode);
+    storage.set(DISPLAY_MODE_KEY, mode);
   }, []);
 
   /**
@@ -141,6 +173,9 @@ export const ThemeProvider: React.FC<PropsWithChildren> = ({ children }) => {
     [mutate],
   );
 
+  const appearance: Appearance =
+    displayMode === 'auto' ? (systemScheme === 'dark' ? 'night' : 'day') : displayMode;
+
   const value = useMemo<ThemeContextValue>(() => {
     const classes = allClasses[theme];
     const classProps = allProps[theme];
@@ -156,6 +191,10 @@ export const ThemeProvider: React.FC<PropsWithChildren> = ({ children }) => {
       defaultClass,
       theme,
       setTheme,
+      palette: PALETTES[appearance],
+      appearance,
+      displayMode,
+      setDisplayMode,
       addClass: (name: string) =>
         addTo(classes, setAllClasses, classesKey, MAX_CLASS_NAME_LENGTH, name),
       removeClass: (name: string) =>
@@ -167,7 +206,7 @@ export const ThemeProvider: React.FC<PropsWithChildren> = ({ children }) => {
         mutate(setAllProps, propsKey, (list) => list.filter((item) => item !== name)),
       resetProps: () => mutate(setAllProps, propsKey, () => [...DEFAULT_PROPS[theme]]),
     };
-  }, [allClasses, allProps, theme, setTheme, addTo, mutate]);
+  }, [allClasses, allProps, theme, setTheme, appearance, displayMode, setDisplayMode, addTo, mutate]);
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 };

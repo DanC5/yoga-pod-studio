@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import { useThemeContext } from '../context/ThemeContext';
+import type { Palette } from '../constants/palette';
 import {
   LOCATION_LABELS,
   MAX_CLASS_NAME_LENGTH,
@@ -36,6 +37,8 @@ const EditableList: React.FC<EditableListProps> = ({
   onRemove,
   onReset,
 }) => {
+  const { palette } = useThemeContext();
+  const styles = useMemo(() => makeStyles(palette), [palette]);
   const [draft, setDraft] = useState('');
   const [error, setError] = useState('');
 
@@ -82,9 +85,9 @@ const EditableList: React.FC<EditableListProps> = ({
           }}
           onSubmitEditing={handleAdd}
           placeholder={placeholder}
-          placeholderTextColor="#9b9b9b"
+          placeholderTextColor={palette.textMuted}
           returnKeyType="done"
-          selectionColor="#00aeef"
+          selectionColor={palette.accent}
           style={styles.addInput}
           value={draft}
         />
@@ -128,11 +131,13 @@ export const ManageListsScreen = () => {
     classes,
     classProps,
     removeClass,
+    palette,
     removeProp,
     resetClasses,
     resetProps,
     theme,
   } = useThemeContext();
+  const styles = useMemo(() => makeStyles(palette), [palette]);
 
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.container}>
@@ -164,112 +169,121 @@ export const ManageListsScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#fff',
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 16,
+const makeStyles = (p: Palette) =>
+  StyleSheet.create({
+      container: {
+      backgroundColor: p.bg,
+      flex: 1,
+      paddingHorizontal: 24,
+      paddingTop: 16,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    textAlign: 'center',
+      title: {
+      color: p.text,
+      fontSize: 32,
+      fontWeight: 'bold',
+      textAlign: 'center',
   },
-  subtitle: {
-    color: '#6b6b6b',
-    fontSize: 18,
-    marginBottom: 16,
-    marginTop: 4,
-    textAlign: 'center',
+      subtitle: {
+      color: p.textMuted,
+      fontSize: 18,
+      marginBottom: 16,
+      marginTop: 4,
+      textAlign: 'center',
   },
-  columns: {
-    flex: 1,
-    flexDirection: 'row',
+      columns: {
+      flex: 1,
+      flexDirection: 'row',
   },
-  column: {
-    flex: 1,
-    paddingHorizontal: 12,
+      column: {
+      flex: 1,
+      paddingHorizontal: 12,
   },
-  columnTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 12,
+      columnTitle: {
+      color: p.text,
+      fontSize: 24,
+      fontWeight: 'bold',
+      marginBottom: 12,
   },
-  addRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
+      addRow: {
+      alignItems: 'center',
+      flexDirection: 'row',
   },
-  addInput: {
-    borderColor: 'gray',
-    borderRadius: 8,
-    borderWidth: 1,
-    flex: 1,
-    fontSize: 20,
-    height: 48,
-    paddingHorizontal: 12,
+      addInput: {
+      backgroundColor: p.surface,
+      color: p.text,
+      borderColor: p.border,
+      borderRadius: 8,
+      borderWidth: 1,
+      flex: 1,
+      fontSize: 20,
+      height: 48,
+      paddingHorizontal: 12,
   },
-  addBtn: {
-    backgroundColor: '#143980',
-    borderRadius: 8,
-    marginLeft: 12,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
+      addBtn: {
+      backgroundColor: p.accent,
+      borderRadius: 8,
+      marginLeft: 12,
+      paddingHorizontal: 24,
+      paddingVertical: 12,
   },
-  addBtnText: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
+      addBtnText: {
+      color: p.accentText,
+      fontSize: 20,
+      fontWeight: 'bold',
   },
-  error: {
-    color: 'firebrick',
-    fontSize: 16,
-    marginTop: 6,
+      error: {
+      color: p.danger,
+      fontSize: 16,
+      marginTop: 6,
   },
-  list: {
-    borderColor: '#e6e6e6',
-    borderRadius: 8,
-    borderWidth: 1,
-    flex: 1,
-    marginTop: 12,
+      list: {
+      borderColor: p.border,
+      borderRadius: 8,
+      borderWidth: 1,
+      flex: 1,
+      marginTop: 12,
   },
-  empty: {
-    color: '#9b9b9b',
-    fontSize: 18,
-    padding: 16,
+      empty: {
+      color: p.textMuted,
+      fontSize: 18,
+      padding: 16,
   },
-  row: {
-    alignItems: 'center',
-    borderBottomColor: '#f0f0f0',
-    borderBottomWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+      row: {
+      backgroundColor: p.surface,
+      alignItems: 'center',
+      borderBottomColor: p.border,
+      borderBottomWidth: 1,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingHorizontal: 16,
+      paddingVertical: 14,
   },
-  rowText: {
-    flex: 1,
-    fontSize: 20,
+      rowText: {
+      color: p.text,
+      flex: 1,
+      fontSize: 20,
   },
-  removeBtn: {
-    paddingHorizontal: 8,
+      removeBtn: {
+      paddingHorizontal: 8,
   },
-  removeBtnText: {
-    color: 'salmon',
-    fontSize: 22,
-    fontWeight: 'bold',
+      removeBtnText: {
+      color: p.danger,
+      fontSize: 22,
+      fontWeight: 'bold',
   },
-  resetBtn: {
-    alignItems: 'center',
-    backgroundColor: '#e6e6e6',
-    borderRadius: 8,
-    marginBottom: 16,
-    marginTop: 12,
-    padding: 14,
+      resetBtn: {
+      alignItems: 'center',
+      backgroundColor: 'transparent',
+      borderColor: p.border,
+      borderWidth: 1.5,
+      borderRadius: 8,
+      marginBottom: 16,
+      marginTop: 12,
+      padding: 14,
   },
-  resetText: {
-    color: 'salmon',
-    fontSize: 18,
-    fontWeight: 'bold',
+      resetText: {
+      color: p.danger,
+      fontSize: 18,
+      fontWeight: 'bold',
   },
-});
+  });
