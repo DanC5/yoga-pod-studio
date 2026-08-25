@@ -18,27 +18,14 @@ export const DisplayScreen = () => {
       {!!props.length && (
         <View style={styles.propsCol}>
           <Text style={styles.prompt}>Please grab...</Text>
-          <View style={styles.propsRow}>
-            {props.map((p, i) => {
-              if (i < 3) {
-                return (
-                  <View style={styles.propsCard} key={i}>
-                    <Text style={styles.propsText}>{p}</Text>
-                  </View>
-                );
-              }
-            })}
-          </View>
-          <View style={styles.propsRow}>
-            {props.map((p, i) => {
-              if (i >= 3) {
-                return (
-                  <View style={styles.propsCard} key={i}>
-                    <Text style={styles.propsText}>{p}</Text>
-                  </View>
-                );
-              }
-            })}
+          {/* Wraps to as many rows as needed. The old version split at a
+              fixed index of 3, so a 7th or 8th prop silently overflowed. */}
+          <View style={styles.propsGrid}>
+            {props.map((p) => (
+              <View style={styles.propsCard} key={p}>
+                <Text style={styles.propsText}>{p}</Text>
+              </View>
+            ))}
           </View>
         </View>
       )}
@@ -84,9 +71,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  propsRow: {
+  propsGrid: {
+    alignItems: 'center',
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'center',
+    paddingHorizontal: 40,
   },
   propsCard: {
     backgroundColor: '#00aeef',

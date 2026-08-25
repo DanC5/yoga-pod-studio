@@ -10,6 +10,7 @@ import { createStackNavigator, StackNavigationProp } from '@react-navigation/sta
 import { DisplayScreen } from './screens/Display';
 import { IdleScreen } from './screens/Idle';
 import { InputScreen } from './screens/Input';
+import { ManageListsScreen } from './screens/ManageLists';
 
 type DisplayParams = {
   classStyle: string;
@@ -21,6 +22,7 @@ export type StackParamList = {
   Idle: undefined;
   Input: undefined;
   Display: DisplayParams;
+  ManageLists: undefined;
 };
 
 export type NavigationProp = StackNavigationProp<StackParamList>;
@@ -76,6 +78,11 @@ export const Navigator: React.FC = () => {
         <Stack.Screen
           name="Display"
           component={DisplayScreen}
+          options={{ headerBackTitle: 'Class Setup' }}
+        />
+        <Stack.Screen
+          name="ManageLists"
+          component={ManageListsScreen}
           options={{ headerBackTitle: 'Class Setup' }}
         />
       </Stack.Navigator>
