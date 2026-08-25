@@ -1,0 +1,323 @@
+import React, { useMemo, useState } from 'react';
+import {
+  Alert,
+  KeyboardAvoidingView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
+import { useThemeContext } from '../context/ThemeContext';
+import type { Palette } from '../constants/palette';
+import {
+  LOCATION_LABELS,
+  MAX_CLASS_NAME_LENGTH,
+  MAX_PROP_NAME_LENGTH,
+} from '../constants/defaults';
+
+type EditableListProps = {
+  title: string;
+  items: string[];
+  maxLength: number;
+  placeholder: string;
+  onAdd: (name: string) => { ok: true } | { ok: false; reason: 'empty' | 'duplicate' };
+  onRemove: (name: string) => void;
+  onReset: () => void;
+  /** Class Types only: marks a class as hot so it shows the towel notice. */
+  hot?: { isHot: (name: string) => boolean; onToggle: (name: string) => void };
+};
+
+const EditableList: React.FC<EditableListProps> = ({
+  title,
+  items,
+  maxLength,
+  placeholder,
+  onAdd,
+  onRemove,
+  onReset,
+  hot,
+}) => {
+  const { palette } = useThemeContext();
+  const styles = useMemo(() => makeStyles(palette), [palette]);
+  const [draft, setDraft] = useState('');
+  const [error, setError] = useState('');
+
+  const handleAdd = () => {
+    const result = onAdd(draft);
+
+    if (result.ok) {
+      setDraft('');
+      setError('');
+      return;
+    }
+
+    setError(result.reason === 'duplicate' ? 'That one already exists' : 'Type a name first');
+  };
+
+  // Deleting is the only destructive action on this screen, so it asks.
+  // Adding stays a single tap.
+  const confirmRemove = (item: string) => {
+    Alert.alert(`Remove "${item}"?`, 'It will disappear from the setup screen.', [
+      { text: 'Keep', style: 'cancel' },
+      { text: 'Remove', style: 'destructive', onPress: () => onRemove(item) },
+    ]);
+  };
+
+  const confirmReset = () => {
+    Alert.alert(`Reset ${title.toLowerCase()}?`, 'This restores the original list. Anything you added will be lost.', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Reset', style: 'destructive', onPress: onReset },
+    ]);
+  };
+
+  return (
+    <View style={styles.column}>
+      <Text style={styles.columnTitle}>{title}</Text>
+
+      <View style={styles.addRow}>
+        <TextInput
+          maxLength={maxLength}
+          onChangeText={(text) => {
+            setDraft(text);
+            if (error) {
+              setError('');
+            }
+          }}
+          onSubmitEditing={handleAdd}
+          placeholder={placeholder}
+          placeholderTextColor={palette.textMuted}
+          returnKeyType="done"
+          selectionColor={palette.accent}
+          style={styles.addInput}
+          value={draft}
+        />
+        <TouchableOpacity onPress={handleAdd} style={styles.addBtn}>
+          <Text style={styles.addBtnText}>Add</Text>
+        </TouchableOpacity>
+      </View>
+
+      {!!error && <Text style={styles.error}>{error}</Text>}
+
+      <ScrollView style={styles.list} keyboardShouldPersistTaps="handled">
+        {items.length === 0 && (
+          <Text style={styles.empty}>Nothing here yet. Add one above, or reset to defaults.</Text>
+        )}
+        {items.map((item) => (
+          <View key={item} style={styles.row}>
+            <Text style={styles.rowText}>{item}</Text>
+            {hot && (
+              <TouchableOpacity
+                accessibilityLabel={`${hot.isHot(item) ? 'Unmark' : 'Mark'} ${item} as a hot class`}
+                accessibilityState={{ selected: hot.isHot(item) }}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                onPress={() => hot.onToggle(item)}
+                style={[styles.hotBtn, hot.isHot(item) && styles.hotBtnOn]}
+              >
+                <Text style={hot.isHot(item) ? styles.hotOn : styles.hotOff}>🔥</Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity
+              accessibilityLabel={`Remove ${item}`}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              onPress={() => confirmRemove(item)}
+              style={styles.removeBtn}
+            >
+              <Text style={styles.removeBtnText}>✕</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
+      </ScrollView>
+
+      <TouchableOpacity onPress={confirmReset} style={styles.resetBtn}>
+        <Text style={styles.resetText}>Reset to Defaults</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+export const ManageListsScreen = () => {
+  const {
+    addClass,
+    addProp,
+    classes,
+    isHot,
+    toggleHot,
+    classProps,
+    removeClass,
+    palette,
+    removeProp,
+    resetClasses,
+    resetProps,
+    theme,
+  } = useThemeContext();
+  const styles = useMemo(() => makeStyles(palette), [palette]);
+
+  return (
+    <KeyboardAvoidingView behavior="padding" style={styles.container}>
+      <Text style={styles.title}>Edit Lists — {LOCATION_LABELS[theme]}</Text>
+      <Text style={styles.subtitle}>
+        Changes save automatically and apply to every class on this iPad.
+        {'\n'}Tap 🔥 to mark a class as hot — those show the towel notice on the display.
+      </Text>
+      <View style={styles.columns}>
+        <EditableList
+          hot={{ isHot, onToggle: toggleHot }}
+          items={classes}
+          maxLength={MAX_CLASS_NAME_LENGTH}
+          onAdd={addClass}
+          onRemove={removeClass}
+          onReset={resetClasses}
+          placeholder="New class type"
+          title="Class Types"
+        />
+        <EditableList
+          items={classProps}
+          maxLength={MAX_PROP_NAME_LENGTH}
+          onAdd={addProp}
+          onRemove={removeProp}
+          onReset={resetProps}
+          placeholder="New prop"
+          title="Props"
+        />
+      </View>
+    </KeyboardAvoidingView>
+  );
+};
+
+const makeStyles = (p: Palette) =>
+  StyleSheet.create({
+      container: {
+      backgroundColor: p.bg,
+      flex: 1,
+      paddingHorizontal: 24,
+      paddingTop: 16,
+  },
+      title: {
+      color: p.text,
+      fontSize: 32,
+      fontWeight: 'bold',
+      textAlign: 'center',
+  },
+      subtitle: {
+      color: p.textMuted,
+      fontSize: 18,
+      marginBottom: 16,
+      marginTop: 4,
+      textAlign: 'center',
+  },
+      columns: {
+      flex: 1,
+      flexDirection: 'row',
+  },
+      column: {
+      flex: 1,
+      paddingHorizontal: 12,
+  },
+      columnTitle: {
+      color: p.text,
+      fontSize: 24,
+      fontWeight: 'bold',
+      marginBottom: 12,
+  },
+      addRow: {
+      alignItems: 'center',
+      flexDirection: 'row',
+  },
+      addInput: {
+      backgroundColor: p.surface,
+      color: p.text,
+      borderColor: p.border,
+      borderRadius: 8,
+      borderWidth: 1,
+      flex: 1,
+      fontSize: 20,
+      height: 48,
+      paddingHorizontal: 12,
+  },
+      addBtn: {
+      backgroundColor: p.accent,
+      borderRadius: 8,
+      marginLeft: 12,
+      paddingHorizontal: 24,
+      paddingVertical: 12,
+  },
+      addBtnText: {
+      color: p.accentText,
+      fontSize: 20,
+      fontWeight: 'bold',
+  },
+      error: {
+      color: p.danger,
+      fontSize: 16,
+      marginTop: 6,
+  },
+      list: {
+      borderColor: p.border,
+      borderRadius: 8,
+      borderWidth: 1,
+      flex: 1,
+      marginTop: 12,
+  },
+      empty: {
+      color: p.textMuted,
+      fontSize: 18,
+      padding: 16,
+  },
+      row: {
+      backgroundColor: p.surface,
+      alignItems: 'center',
+      borderBottomColor: p.border,
+      borderBottomWidth: 1,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+  },
+      rowText: {
+      color: p.text,
+      flex: 1,
+      fontSize: 20,
+  },
+      hotBtn: {
+        borderRadius: 6,
+        marginRight: 4,
+        opacity: 0.28,
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+      },
+      hotBtnOn: {
+        opacity: 1,
+      },
+      hotOn: {
+        fontSize: 18,
+      },
+      hotOff: {
+        fontSize: 18,
+      },
+      removeBtn: {
+      paddingHorizontal: 8,
+  },
+      removeBtnText: {
+      color: p.danger,
+      fontSize: 22,
+      fontWeight: 'bold',
+  },
+      resetBtn: {
+      alignItems: 'center',
+      backgroundColor: 'transparent',
+      borderColor: p.border,
+      borderWidth: 1.5,
+      borderRadius: 8,
+      marginBottom: 16,
+      marginTop: 12,
+      padding: 14,
+  },
+      resetText: {
+      color: p.danger,
+      fontSize: 18,
+      fontWeight: 'bold',
+  },
+  });

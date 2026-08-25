@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Keyboard,
+  StatusBar,
   KeyboardAvoidingView,
   StyleSheet,
   Text,
@@ -15,42 +16,61 @@ import { Picker } from '@react-native-picker/picker';
 import { PropCard } from '../components/PropCard';
 import { useThemeContext } from '../context/ThemeContext';
 
+import type { Palette } from '../constants/palette';
 import type { NavigationProp } from '../Navigator';
 
 export const InputScreen = () => {
   const navigation = useNavigation<NavigationProp>();
-  const { classes, classProps, defaultClass, theme } = useThemeContext();
+  const { classes, classProps, defaultClass, palette } = useThemeContext();
+  const styles = useMemo(() => makeStyles(palette), [palette]);
 
   const [classStyle, setClassStyle] = useState(defaultClass);
   const [error, setError] = useState(false);
   const [props, setProps] = useState<string[]>([]);
   const [teacher, setTeacher] = useState('');
-  const [unselectAll, setUnselectAll] = useState(true);
 
   useEffect(() => {
     if (error && teacher) {
       setError(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [teacher]);
+  }, [error, teacher]);
+
+  // If the selected class was deleted in Edit Lists while this screen was
+  // mounted, snap back to a valid one instead of submitting a ghost.
+  useEffect(() => {
+    if (classStyle && !classes.includes(classStyle)) {
+      setClassStyle(defaultClass);
+    }
+  }, [classes, classStyle, defaultClass]);
+
+  // Same for props: never carry a deleted prop through to the display.
+  useEffect(() => {
+    setProps((prev) => {
+      const pruned = prev.filter((p) => classProps.includes(p));
+      return pruned.length === prev.length ? prev : pruned;
+    });
+  }, [classProps]);
+
+  const toggleProp = useCallback((prop: string) => {
+    setProps((prev) => (prev.includes(prop) ? prev.filter((p) => p !== prop) : [...prev, prop]));
+  }, []);
 
   const clearFields = () => {
     setClassStyle(defaultClass);
     setError(false);
     setProps([]);
     setTeacher('');
-    setUnselectAll(true);
   };
 
   const handleSubmit = () => {
-    if (!teacher) {
+    if (!teacher.trim()) {
       return setError(true);
     }
 
     navigation.navigate('Display', {
       classStyle,
       props,
-      teacher,
+      teacher: teacher.trim(),
     });
   };
 
@@ -61,68 +81,64 @@ export const InputScreen = () => {
         style={styles.container}
         keyboardVerticalOffset={-250}
       >
-        <Text style={styles.title}>Set Up Your Class:</Text>
+        <StatusBar barStyle={palette.statusBar} />
+        <View style={styles.titleRow}>
+          <Text style={styles.title}>Set Up Your Class:</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('ManageLists')}
+            style={styles.editListsBtn}
+          >
+            <Text style={styles.editListsText}>Edit Lists</Text>
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.inputContainer}>
           <View style={styles.inputWrap}>
             <Text style={styles.inputLabel}>Teacher:</Text>
             <TextInput
               maxLength={20}
+              placeholderTextColor={palette.textMuted}
               onChangeText={setTeacher}
               returnKeyType={'next'}
-              selectionColor="#00aeef"
+              selectionColor={palette.accent}
               style={styles.input}
               value={teacher}
             />
           </View>
           {error && <Text style={styles.error}>Please enter your name</Text>}
         </View>
+
         <View style={styles.pickerWrap}>
           <Text style={styles.inputLabel}>Class Type:</Text>
           <Picker
+            dropdownIconColor={palette.text}
+            itemStyle={{ color: palette.text }}
             onValueChange={(value) => setClassStyle(value)}
             selectedValue={classStyle}
             style={styles.picker}
           >
-            {classes.map((cl, index) => {
-              return <Picker.Item key={index} label={cl} value={cl} />;
-            })}
+            {classes.map((cl) => (
+              <Picker.Item key={cl} label={cl} value={cl} />
+            ))}
           </Picker>
         </View>
+
         <View style={styles.propsWrap}>
           <Text style={styles.inputLabel}>Class Props:</Text>
-          <View style={styles.propsCol}>
-            <View style={styles.propsRow}>
-              {classProps.map((prop, index) => {
-                if (index < (theme === 'gnv' ? 4 : 5)) {
-                  return (
-                    <PropCard
-                      key={index}
-                      prop={prop}
-                      props={props}
-                      setUnselectAll={setUnselectAll}
-                      unselectAll={unselectAll}
-                    />
-                  );
-                }
-              })}
-            </View>
-            <View style={styles.propsRow}>
-              {classProps.map((prop, index) => {
-                if (index >= (theme === 'gnv' ? 4 : 5)) {
-                  return (
-                    <PropCard
-                      key={index}
-                      prop={prop}
-                      props={props}
-                      setUnselectAll={setUnselectAll}
-                      unselectAll={unselectAll}
-                    />
-                  );
-                }
-              })}
-            </View>
+          {/* Wraps instead of the old hard-coded 4-or-5-per-row split, so
+              teachers can add props without breaking the layout. */}
+          <View style={styles.propsGrid}>
+            {classProps.map((prop) => (
+              <PropCard
+                key={prop}
+                onToggle={toggleProp}
+                prop={prop}
+                selected={props.includes(prop)}
+              />
+            ))}
           </View>
         </View>
+
         <View style={styles.buttonWrap}>
           <TouchableOpacity style={styles.clearBtn} onPress={clearFields}>
             <Text style={styles.clearText}>Clear Fields</Text>
@@ -136,86 +152,112 @@ export const InputScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    flex: 1,
-    justifyContent: 'space-evenly',
+const makeStyles = (p: Palette) =>
+  StyleSheet.create({
+      container: {
+      alignItems: 'center',
+      backgroundColor: p.bg,
+      flex: 1,
+      justifyContent: 'space-evenly',
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
+      titleRow: {
+      alignItems: 'center',
+      flexDirection: 'row',
   },
-  inputContainer: {
-    alignItems: 'center',
-    width: '100%',
+      title: {
+      color: p.text,
+      fontSize: 32,
+      fontWeight: 'bold',
   },
-  inputWrap: {
-    alignItems: 'center',
-    flexDirection: 'row',
+      editListsBtn: {
+      borderColor: p.accent,
+      borderRadius: 8,
+      borderWidth: 1,
+      marginLeft: 24,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
   },
-  inputLabel: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    paddingRight: 24,
+      editListsText: {
+      color: p.accent,
+      fontSize: 18,
+      fontWeight: 'bold',
   },
-  input: {
-    borderColor: 'gray',
-    borderRadius: 8,
-    borderWidth: 1,
-    fontSize: 24,
-    height: 48,
-    paddingLeft: 8,
-    width: '33%',
+      inputContainer: {
+      alignItems: 'center',
+      width: '100%',
   },
-  error: {
-    color: 'firebrick',
-    fontSize: 20,
-    marginTop: 8,
+      inputWrap: {
+      alignItems: 'center',
+      flexDirection: 'row',
   },
-  pickerWrap: {
-    alignItems: 'center',
-    flexDirection: 'row',
+      inputLabel: {
+      color: p.text,
+      fontSize: 24,
+      fontWeight: 'bold',
+      paddingRight: 24,
   },
-  picker: {
-    width: 300,
+      input: {
+      backgroundColor: p.surface,
+      color: p.text,
+      borderColor: p.border,
+      borderRadius: 8,
+      borderWidth: 1,
+      fontSize: 24,
+      height: 48,
+      paddingLeft: 8,
+      width: '33%',
   },
-  propsWrap: {
-    alignItems: 'center',
-    flexDirection: 'row',
+      error: {
+      color: p.danger,
+      fontSize: 20,
+      marginTop: 8,
   },
-  propsCol: {
-    alignItems: 'center',
-    flexDirection: 'column',
+      pickerWrap: {
+      alignItems: 'center',
+      flexDirection: 'row',
   },
-  propsRow: {
-    flexDirection: 'row',
+      picker: {
+      color: p.text,
+      width: 300,
   },
-  buttonWrap: {
-    flexDirection: 'row',
-    marginBottom: 24,
+      propsWrap: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      paddingHorizontal: 24,
   },
-  clearBtn: {
-    backgroundColor: '#e6e6e6',
-    borderRadius: 8,
-    marginRight: 20,
-    padding: 16,
+      propsGrid: {
+      alignItems: 'center',
+      flex: 1,
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
   },
-  clearText: {
-    color: 'salmon',
-    fontSize: 24,
-    fontWeight: 'bold',
+      buttonWrap: {
+      flexDirection: 'row',
+      marginBottom: 24,
   },
-  setBtn: {
-    backgroundColor: '#143980',
-    borderRadius: 8,
-    marginLeft: 20,
-    padding: 16,
+      clearBtn: {
+      backgroundColor: 'transparent',
+      borderColor: p.border,
+      borderWidth: 1.5,
+      borderRadius: 8,
+      marginRight: 20,
+      padding: 16,
   },
-  setText: {
-    color: 'white',
-    fontSize: 24,
-    fontWeight: 'bold',
+      clearText: {
+      color: p.danger,
+      fontSize: 24,
+      fontWeight: 'bold',
   },
-});
+      setBtn: {
+      backgroundColor: p.accent,
+      borderRadius: 8,
+      marginLeft: 20,
+      padding: 16,
+  },
+      setText: {
+      color: p.accentText,
+      fontSize: 24,
+      fontWeight: 'bold',
+  },
+  });

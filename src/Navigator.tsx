@@ -10,6 +10,8 @@ import { createStackNavigator, StackNavigationProp } from '@react-navigation/sta
 import { DisplayScreen } from './screens/Display';
 import { IdleScreen } from './screens/Idle';
 import { InputScreen } from './screens/Input';
+import { useThemeContext } from './context/ThemeContext';
+import { ManageListsScreen } from './screens/ManageLists';
 
 type DisplayParams = {
   classStyle: string;
@@ -21,6 +23,7 @@ export type StackParamList = {
   Idle: undefined;
   Input: undefined;
   Display: DisplayParams;
+  ManageLists: undefined;
 };
 
 export type NavigationProp = StackNavigationProp<StackParamList>;
@@ -48,6 +51,7 @@ const HeaderTitle: React.FC<Props> = ({ setIsModalOpen }) => {
 
 export const Navigator: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { palette } = useThemeContext();
 
   return (
     <NavigationContainer ref={navRef}>
@@ -59,9 +63,9 @@ export const Navigator: React.FC = () => {
             paddingBottom: 8,
           },
           headerStyle: {
-            backgroundColor: '#000',
+            backgroundColor: palette.headerBg,
           },
-          headerTintColor: '#fff',
+          headerTintColor: palette.headerTint,
           headerTitleContainerStyle: {
             paddingBottom: 8,
           },
@@ -76,6 +80,11 @@ export const Navigator: React.FC = () => {
         <Stack.Screen
           name="Display"
           component={DisplayScreen}
+          options={{ headerBackTitle: 'Class Setup' }}
+        />
+        <Stack.Screen
+          name="ManageLists"
+          component={ManageListsScreen}
           options={{ headerBackTitle: 'Class Setup' }}
         />
       </Stack.Navigator>
