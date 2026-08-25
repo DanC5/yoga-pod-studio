@@ -5,6 +5,7 @@ import { MMKV } from 'react-native-mmkv';
 import {
   DEFAULT_CLASSES,
   DEFAULT_PROPS,
+  HOT_CLASS_PATTERN,
   MAX_CLASS_NAME_LENGTH,
   MAX_PROP_NAME_LENGTH,
   PREFERRED_DEFAULT_CLASS,
@@ -27,6 +28,7 @@ const storage = new MMKV();
 
 const THEME_KEY = 'theme';
 const DISPLAY_MODE_KEY = 'displayMode';
+const hotKey = (location: Location) => `hotOverrides.${location}`;
 const classesKey = (location: Location) => `classes.${location}`;
 const propsKey = (location: Location) => `props.${location}`;
 
@@ -40,6 +42,24 @@ const readTheme = (): Location => {
 const readDisplayMode = (): DisplayMode => {
   const stored = storage.getString(DISPLAY_MODE_KEY);
   return DISPLAY_MODES.includes(stored as DisplayMode) ? (stored as DisplayMode) : 'auto';
+};
+
+/** className -> explicit hot/not-hot, overriding the name pattern. */
+type HotOverrides = Record<string, boolean>;
+
+const readHotOverrides = (location: Location): HotOverrides => {
+  const raw = storage.getString(hotKey(location));
+
+  if (!raw) {
+    return {};
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
 };
 
 const readList = (key: string, fallback: string[]): string[] => {
@@ -93,6 +113,9 @@ type ThemeContextValue = {
   /** What the user picked; 'auto' defers to the iPad's own setting. */
   displayMode: DisplayMode;
   setDisplayMode: (mode: DisplayMode) => void;
+  /** Hot classes get the towel notice on the display screen. */
+  isHot: (className: string) => boolean;
+  toggleHot: (className: string) => void;
   addClass: (name: string) => AddResult;
   removeClass: (name: string) => void;
   resetClasses: () => void;
@@ -111,6 +134,10 @@ export const ThemeProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [allClasses, setAllClasses] = useState<ListMap>(readAllClasses);
   const [allProps, setAllProps] = useState<ListMap>(readAllProps);
   const [displayMode, setDisplayModeState] = useState<DisplayMode>(readDisplayMode);
+  const [allHot, setAllHot] = useState<Record<Location, HotOverrides>>(() => ({
+    boulder: readHotOverrides('boulder'),
+    gnv: readHotOverrides('gnv'),
+  }));
 
   // iOS pushes this the moment the system appearance flips, so 'auto'
   // re-themes on its own. No timer, nothing to drift, and daylight saving
@@ -122,6 +149,30 @@ export const ThemeProvider: React.FC<PropsWithChildren> = ({ children }) => {
     setThemeState(location);
     storage.set(THEME_KEY, location);
   }, []);
+
+  const isHot = useCallback(
+    (className: string) => {
+      const override = allHot[theme][className];
+      return override === undefined ? HOT_CLASS_PATTERN.test(className) : override;
+    },
+    [allHot, theme],
+  );
+
+  const toggleHot = useCallback(
+    (className: string) => {
+      setAllHot((prev) => {
+        const current = prev[theme];
+        const wasHot =
+          current[className] === undefined
+            ? HOT_CLASS_PATTERN.test(className)
+            : current[className];
+        const next = { ...current, [className]: !wasHot };
+        storage.set(hotKey(theme), JSON.stringify(next));
+        return { ...prev, [theme]: next };
+      });
+    },
+    [theme],
+  );
 
   const setDisplayMode = useCallback((mode: DisplayMode) => {
     setDisplayModeState(mode);
@@ -195,6 +246,8 @@ export const ThemeProvider: React.FC<PropsWithChildren> = ({ children }) => {
       appearance,
       displayMode,
       setDisplayMode,
+      isHot,
+      toggleHot,
       addClass: (name: string) =>
         addTo(classes, setAllClasses, classesKey, MAX_CLASS_NAME_LENGTH, name),
       removeClass: (name: string) =>
@@ -206,7 +259,7 @@ export const ThemeProvider: React.FC<PropsWithChildren> = ({ children }) => {
         mutate(setAllProps, propsKey, (list) => list.filter((item) => item !== name)),
       resetProps: () => mutate(setAllProps, propsKey, () => [...DEFAULT_PROPS[theme]]),
     };
-  }, [allClasses, allProps, theme, setTheme, appearance, displayMode, setDisplayMode, addTo, mutate]);
+  }, [allClasses, allProps, theme, setTheme, appearance, displayMode, setDisplayMode, isHot, toggleHot, addTo, mutate]);
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 };

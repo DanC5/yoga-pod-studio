@@ -26,6 +26,8 @@ type EditableListProps = {
   onAdd: (name: string) => { ok: true } | { ok: false; reason: 'empty' | 'duplicate' };
   onRemove: (name: string) => void;
   onReset: () => void;
+  /** Class Types only: marks a class as hot so it shows the towel notice. */
+  hot?: { isHot: (name: string) => boolean; onToggle: (name: string) => void };
 };
 
 const EditableList: React.FC<EditableListProps> = ({
@@ -36,6 +38,7 @@ const EditableList: React.FC<EditableListProps> = ({
   onAdd,
   onRemove,
   onReset,
+  hot,
 }) => {
   const { palette } = useThemeContext();
   const styles = useMemo(() => makeStyles(palette), [palette]);
@@ -105,6 +108,17 @@ const EditableList: React.FC<EditableListProps> = ({
         {items.map((item) => (
           <View key={item} style={styles.row}>
             <Text style={styles.rowText}>{item}</Text>
+            {hot && (
+              <TouchableOpacity
+                accessibilityLabel={`${hot.isHot(item) ? 'Unmark' : 'Mark'} ${item} as a hot class`}
+                accessibilityState={{ selected: hot.isHot(item) }}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                onPress={() => hot.onToggle(item)}
+                style={[styles.hotBtn, hot.isHot(item) && styles.hotBtnOn]}
+              >
+                <Text style={hot.isHot(item) ? styles.hotOn : styles.hotOff}>🔥</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
               accessibilityLabel={`Remove ${item}`}
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
@@ -129,6 +143,8 @@ export const ManageListsScreen = () => {
     addClass,
     addProp,
     classes,
+    isHot,
+    toggleHot,
     classProps,
     removeClass,
     palette,
@@ -144,9 +160,11 @@ export const ManageListsScreen = () => {
       <Text style={styles.title}>Edit Lists — {LOCATION_LABELS[theme]}</Text>
       <Text style={styles.subtitle}>
         Changes save automatically and apply to every class on this iPad.
+        {'\n'}Tap 🔥 to mark a class as hot — those show the towel notice on the display.
       </Text>
       <View style={styles.columns}>
         <EditableList
+          hot={{ isHot, onToggle: toggleHot }}
           items={classes}
           maxLength={MAX_CLASS_NAME_LENGTH}
           onAdd={addClass}
@@ -263,6 +281,22 @@ const makeStyles = (p: Palette) =>
       flex: 1,
       fontSize: 20,
   },
+      hotBtn: {
+        borderRadius: 6,
+        marginRight: 4,
+        opacity: 0.28,
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+      },
+      hotBtnOn: {
+        opacity: 1,
+      },
+      hotOn: {
+        fontSize: 18,
+      },
+      hotOff: {
+        fontSize: 18,
+      },
       removeBtn: {
       paddingHorizontal: 8,
   },

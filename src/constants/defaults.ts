@@ -97,3 +97,19 @@ export const PREFERRED_DEFAULT_CLASS: Record<Location, string> = {
 /** Guards against a teacher pasting an essay into the class name field. */
 export const MAX_CLASS_NAME_LENGTH = 40;
 export const MAX_PROP_NAME_LENGTH = 24;
+
+/**
+ * Hot-class detection.
+ *
+ * Classes whose name matches are treated as hot automatically, which covers
+ * every hot class on both existing lists with no setup. Because teachers can
+ * add their own class types, a per-class override is stored alongside the
+ * lists so anything the pattern misses (or wrongly catches) can be corrected
+ * from the Edit Lists screen.
+ */
+export const HOT_CLASS_PATTERN = /hot|heat|sweat|95|\u{1F525}/iu;
+
+export const HOT_CLASS_NOTICE = 'Towel required — please do not use yin blankets';
+
+/** Shown on every class. The practice rooms are phone-free. */
+export const PHONE_FREE_LABEL = 'Phone-free practice room';

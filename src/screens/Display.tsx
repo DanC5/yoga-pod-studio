@@ -3,6 +3,8 @@ import { StatusBar, StyleSheet, Text, View } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 
 import { useThemeContext } from '../context/ThemeContext';
+import { NoPhoneBadge } from '../components/NoPhoneBadge';
+import { HOT_CLASS_NOTICE, PHONE_FREE_LABEL } from '../constants/defaults';
 
 import type { Palette } from '../constants/palette';
 import type { StackParamList } from '../Navigator';
@@ -13,7 +15,7 @@ export const DisplayScreen = () => {
   const {
     params: { classStyle, props, teacher },
   } = useRoute<RouteParams>();
-  const { palette } = useThemeContext();
+  const { isHot, palette } = useThemeContext();
   const styles = useMemo(() => makeStyles(palette), [palette]);
 
   return (
@@ -40,6 +42,18 @@ export const DisplayScreen = () => {
           <Text style={styles.noPropsText}>No props specified</Text>
         </View>
       )}
+
+      {isHot(classStyle) && (
+        <View style={styles.hotNotice}>
+          <Text style={styles.hotNoticeText}>{HOT_CLASS_NOTICE}</Text>
+        </View>
+      )}
+
+      {/* Every class, every time. The practice rooms are phone-free. */}
+      <View style={styles.phoneFree}>
+        <NoPhoneBadge color={palette.textMuted} size={56} />
+        <Text style={styles.phoneFreeText}>{PHONE_FREE_LABEL}</Text>
+      </View>
     </View>
   );
 };
@@ -109,6 +123,33 @@ const makeStyles = (p: Palette) =>
       marginTop: 50,
       paddingHorizontal: 32,
       paddingVertical: 20,
+    },
+    hotNotice: {
+      borderColor: p.accent,
+      borderRadius: 10,
+      borderWidth: 2,
+      marginTop: 28,
+      paddingHorizontal: 28,
+      paddingVertical: 14,
+    },
+    hotNoticeText: {
+      color: p.accent,
+      fontSize: 30,
+      fontWeight: 'bold',
+      textAlign: 'center',
+    },
+    phoneFree: {
+      alignItems: 'center',
+      bottom: 36,
+      flexDirection: 'row',
+      gap: 16,
+      position: 'absolute',
+    },
+    phoneFreeText: {
+      color: p.textMuted,
+      fontSize: 22,
+      letterSpacing: 2,
+      textTransform: 'uppercase',
     },
     noPropsText: {
       color: p.textMuted,
